@@ -1,2 +1,2 @@
 # libraryapp
-final project with Arseniy
+final project of Arseniy and Iassin

@@ -1,0 +1,42 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    container_name: demo_postgres
+    environment:
+      POSTGRES_DB: demo_db2
+      POSTGRES_USER: demo_user3
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demo_user3 -d demo_db2"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: demo_app2
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/demo_db2
+      SPRING_DATASOURCE_USERNAME: demo_user3
+      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_FORMAT_SQL: "true"
+      SERVER_PORT: 8080
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+#  java -jar target/demo-0.0.1-SNAPSHOT.jar
+#  mvn spring-boot:run
